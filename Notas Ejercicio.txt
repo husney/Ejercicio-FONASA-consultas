@@ -1,0 +1,58 @@
+FONASA EPS (Fondo Nacional de Salud)
+
+Las consultas se controla con el ID de un Hospital, la cantidad de pacientes atendidos, el nombre del especialista, el estado de la consutla puede ser "Ocupado" o "En espera de atención" el tpio de consultas son (Pediatría, Urgencia o CGI (ConsultaGeneralIntegral))
+
+Cada hospital divide su atención decacuerdo a la edad del paciente
+
+Niño = 1 a 15 años 
+Joven = 16 a 40 años
+Anciano = 41 en adelante
+
+Niños = peso, estatura
+Jovenes = Fumador, Años de fumador (0 a n)
+Ancianos = dieta asignada
+
+los pacientes contienen 
+Nombre, Edad, Numero de historia clinica
+Si son niños se controla además la Relacion (Peso, Estatura) valor entre ( 1 y 4 ) 
+de los jovenes se necesita saber si es fumador o no y además los años que lleva de fumador que tienen u n valor entre ( 0 a n ) 
+y de los ancianos si tienen dieta asignada
+
+Prioridades asignadas por el hospital:
+Niños:
+	( 1 - 5 años)
+		peso-estatura + 3
+	( 6 - 12 años)
+		peso-estatura + 2
+	(13 - 15 años)
+		peso - estatura + 1
+
+Jovenes:
+	( Si es fumador ) 
+		Años fumador / 4 + 2
+	( En otro caso )
+		2
+
+Ancianos:
+	(Si tiene dieta y esta entre 60 y 100 años)
+		Edad / 20 + 4
+	( En otro caso )
+		Edad / 30 + 3
+
+A demas se debe saber el riesgo del paciente que se determina por
+	(Edad * Prioridad) / 100
+
+y en caso de los ancianos:
+	(Edad * Prioridad ) / 100 + 5.3
+
+
+Se atiende a un paciente respecto a su prioridad (Los de mayor prioridad van primero)
+para esto se analiza si existe alguna consulta para su antención ( el estado de la consulta debe ser desocupada) en caso de ser niño con prioridad menor ó igual a 4, sólo pueden ser atendidos en una consulta de pediatría a los pacientes con prioridad mayor que 4 independientemente de la edad, se debe tener en cuenta que si no existe consulta disponible para atender el paciente de la sala de pendientes, este pasará apara una sala de espera donde al igual serán atendidos en dependencia a su prioridad
+
+El flujo de actividades para la atención del paciente es el siguietne:
+
+1 - Atender a todos los pacientes en la sala de espera que sea posible dada la disponibleidad de consultas.
+
+2 - Si la sala de espera está vacia (Inicialmente o luego de atender a los pacientes en espera) se atienden los pacientes pendientes según su prioirdad y orden de llegada
+
+3 - Si luego de atendidos los de la sala de espera no queda ninguna consulta libre, entonces el paciente de la sala de pendiente que le corresponde ser atendido según su prioridad, pasa a la asala de espera si no será atendido por una consulta adecuada

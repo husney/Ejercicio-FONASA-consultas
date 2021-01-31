@@ -1,0 +1,57 @@
+{% extends 'Base.html' %}
+
+{% block title %} Pacientes {% endblock %}
+
+{% block head %} 
+
+{% endblock %}
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css"> 
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css')}}">
+    
+
+{% block body %}
+
+    <div class="row d-flex justify-content-end">
+        <a href="{{ url_for('registroPacientes') }}" class="btn btn-success mt-2 mb-2 mr-3">Registrar Paciente</a>
+    </div>
+    <table  class="tabla table-dark table table-striped table-hover table-bordered rounded mt-3">
+            <thead class="text-center">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Edad</th>
+                    <th>N° Historia clinica</th>
+                    <th>Editar</th>
+                    <th>Eliminar</th>
+                </tr>
+            </thead>
+            <tfoot class="text-center">
+                <tr>
+                    <th colspan="5">FONASA PACIENTES</th>
+                </tr>
+            </tfoot>
+            <tbody class="text-center">
+                {% for paciente in pacientes %}
+                    <tr>
+                        <td>{{ paciente.getNombre() }}</td>
+                        <td>{{ paciente.getEdad() }}</td>
+                        <td>{{ paciente.getNoHistoriaClinica() }}</td>
+                        <td><a href="{{ url_for('editarPaciente', id=paciente.getId()) }}"><i class="fas fa-highlighter "></i></a></td>
+                        <td><a href="javascript:void(0);" id="eliminarPaciente" onclick="eliminarPaciente('/pacientes/del/{{paciente.getId()}}')"><i class="fas fa-trash text-danger"></i></a></td>                      
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>    
+    
+    
+    
+    <!-- Jquery Datatables -->
+    <!-- <script src="https://code.jquery.com/jquery-3.5.1.js"></script> -->
+    <script type="text/javascript" src="{{ url_for('static', filename='Bootstrap/jquery-3.5.1.slim.min.js') }}"></script>
+    <!-- Datatables compatible con boostrap -->
+    <script src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.23/js/dataTables.bootstrap4.min.js"></script>    
+    <script src="{{ url_for('static', filename='js/dataTable.js')}}"></script>
+
+{% endblock %}

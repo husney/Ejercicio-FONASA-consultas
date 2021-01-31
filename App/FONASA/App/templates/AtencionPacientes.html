@@ -1,0 +1,23 @@
+{% extends 'Base.html' %}
+
+{% block title %}Atención Pacientes{% endblock %}
+
+{% block body %}
+    
+    <div class="w-100 mt-5 row">
+        <form   method="POST" class="w-100"  id="form-atencionPacientes">
+            
+            <div class="column-12 d-flex justify-content-end">
+                <div class="row d-flex align-items-center justify-content-end w-50">
+                    <label for="cantidadConsultasLbl" class="mr-1">Cantidad consultas</label>
+                    <input type="number" name="cantidadConsultas" id="cantidadConsultas" class="form-control w-25 d-inline-block mr-1">
+                    <a href="javascript:void(0);" class="btn btn-success" id="btnAsignarCantidad">Asignar</a>
+                </div>
+            </div>            
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/atencionPacientes.js') }}"></script>
+{% endblock %}
+    

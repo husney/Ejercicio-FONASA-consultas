@@ -1,0 +1,51 @@
+la atención del paciente se realiza por su prioridad para esto se analiza si existen consultas para atender (estas deben tener une estado desocupado)
+
+niño con prioridad menor o igual a 4
+	son atendidos solo en una consulta de pediatría
+
+Jovenes y ancianos se atenderán en consultas CGI (Consulta General Integral)
+
+en las consultas de urgencias se atenderán todos los pacientes con prioridad mayor a 4 independientemente de la edad
+
+
+Si no existe una consulta disponible para atender a un paciente este pasara a una sala de espera donde serán atendidos en dependencia a su prioridad
+
+Requisitos:
+Disponiblidad de consultas
+
+Se atienen a todos los pacientes en la sala de espera que sea posible dada la disponibilidad de consultas
+
+-
+En la sala de espera si esta vacia inicialmente o luego de atender a los paciente (En espera) se atienden los pacientes pendientes segun su prioridad y orden de llegada
+
+
+- 
+si liuego de atender a los pacientes de la sala de espera no queda ninguna consulta libre, entonces el paciente pendiente  que corresponde ser atendido segun su prioroidad pasa a la sala de espera si no será atendido por la consulta adecuada
+
+
+Funcionalidades:
+
+Listar_Pacientes_Mayor_Riezgo : dado un número de historia clinica lsitar todos los pacientes con mayor riesgo que el que el paciente de la historia clinica
+
+Atender_Paciente: Atender un paciente
+
+Liberar_Consultas Esta funcionalidad libera todas las consutlas que esten ocupadas en el hostipal, para esta funcionalidad hay que tener en cuenta que una vez se liberen todas las consultas se procede a atender los pacientes que estén en la sala de espera
+
+Listar_Pacientes_Fumadores_Urgentes
+lista el nombre de los pacientes fumadores que necesitan ser atendidos con urgencia
+
+Consultar_Mas_Pacientes_Atendidos consulta que pacientes ha atendido hasta el momento del pedido
+
+En sala de espera
+
+Paciente_Mas_Anciano se necesita saber cual es el paciente más anciano en la sala de espera
+
+Optimizar_Atencion optimiza la atencion en aras que el paciente salga satisfecho de la clínica se reorganizarán de tal forma que queden organizados de manera optima. Para esto los pacientes con mayor prioridad en orden de urgencia quedarán al inicio 
+
+1  - Pacientes con mayor gravedad
+2 - niños y ancianos por Prioridad y orden de llegada
+3 - Jovens más sanos
+
+Los pacientes ubicados en la sala de espera seran ubicados según su orden original, siempre teniendo en cuenta su prioridad y urgencia, Luego de organizada la cola de atención se procede a atender los pacienets poisibles, es decir todos los posibles dada la disponiblidad de consutlas sin realizar ubicaciones en la sala de spera finalmente dse cambia el estado de dtodasl las consultas ocupadas a libre
+
+

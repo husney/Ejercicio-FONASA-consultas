@@ -1,0 +1,7 @@
+- La tabla "Consulta" tiene 2 campos que hacen referencias a otras 2 tablas 
+	columna "tipoConsulta" referencia a (TipoConsulta)
+	columna "estado" referencia a (Estado)
+
+
+
+- La tabla "Hospital" hace de tabla intermedia de la tabla "Consulta" y "Paciente" por lo cual se entiende que habrán tanta cantidad de registros en "Hospital" como consultas agendadas a "Paciente"

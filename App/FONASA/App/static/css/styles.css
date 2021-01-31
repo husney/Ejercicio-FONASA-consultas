@@ -1,0 +1,27 @@
+.pagination{
+    display: flex;
+    justify-content: flex-end;
+}
+
+.dataTables_filter label{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.dataTables_filter .form-control{
+    width: 30%;
+    margin-left: 5px;
+}
+
+.dataTables_length label{
+    display: flex;
+    align-items: center;
+}
+
+.dataTables_length label .custom-select{
+    width: 15%;
+    margin: 0 10px;
+}
+

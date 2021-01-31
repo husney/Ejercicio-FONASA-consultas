@@ -1,0 +1,36 @@
+{% extends 'Base.html' %}
+
+{% block title %}Pacientes - Registro{% endblock %}
+
+{% block body %}
+    
+    <div class="w-100 d-flex justify-content-center mt-5 row">
+        <form   method="POST" class="w-50 align-self-center" id="form-paciente">
+
+               <div class="form-group">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" name="nombre" id="nombre" class="form-control nombre" placeholder="Nombre . . . " >
+               </div>
+
+               <div class="form-group">
+                    <label for="noHistoriaClinica">Numero de historia clinica</label>
+                    <input type="text" name="noHistoriaClinica" id="noHistoriaClinica" class="form-control numero-historia-clinica" placeholder="Historia clinica . . . ">
+                </div>
+
+                <div class="form-group ">
+                    <label for="edad">Edad</label>
+                    <input type="number" name="edad" min="1" max="100" id="edad" class="form-control w-25 edad" placeholder="Edad . . .">
+                </div>
+
+                <div id="datos-adicionales"></div>
+
+                <div id="mensajes-errores"></div>
+
+                <div class="d-flex justify-content-center mt-5">
+                    <button type="submit" name="guardarPaciente" id="btnGuardarPaciente" class="btn btn-success guardar-paciente disabled w-25 mr-3" disabled>Enviar</button>
+                    <a href="{{url_for('pacientes')}}" class="btn btn-danger w-25">Cancelar</a>
+                </div>
+        </form>
+    </div>
+
+{% endblock %}
