@@ -27,11 +27,11 @@ BEGIN
     END IF;
     
     IF operacion = 3 THEN
-		SELECT cantidad FROM cantidadConsultas WHERE id = 1;
+		select cantidad FROM cantidadConsultas WHERE id = 1;
     END IF;
     
-    IF operacion = 5 THEN
-		SELECT COUNT(*) FROM consulta WHERE estado = 2;
+    IF operacion = 5 THEN		
+		SELECT COUNT(*) FROM consulta WHERE estado = 1;	
     END IF;
     
     IF operacion = 6 THEN 
@@ -47,8 +47,10 @@ BEGIN
         paciente.riesgo as RiesgoPaciente,
         paciente.prioridad as PrioridadPaciente    
 		FROM consulta
-		INNER JOIN paciente ON paciente.id = consulta.paciente;
+		INNER JOIN paciente ON paciente.id = consulta.paciente
+        WHERE consulta.estado = 1;
     END IF;
+    
     
 END //
 DELIMITER ; 
@@ -58,10 +60,17 @@ SELECT * FROM cantidadConsultas;
 
 SELECT * FROM Estado;
 
+SELECT cantidad FROM cantidadConsultas WHERE id = 1;
+
+
 SELECT * FROM paciente;
 SELECT * FROM Consulta;
 SELECT * FROM TipoConsulta;
 SELECT * FROM hospital;
+
+
+
+
 
 INSERT INTO hospital(nombre)
 VALUES ('prueba');
@@ -76,10 +85,13 @@ CALL sp_Consultas(1,10);
 CALL sp_Consultas(3,null);
 
 
+
+
 SELECT * FROM PJoven;
 SELECT * FROM PNinno;
 SELECT * FROM PAnciano;
 
+# En consulta
 SELECT consulta.id as IdConsulta,
         consulta.cantidadPacientes as CantidadPacientes,
         consulta.nombreEspecialista as NombreEspecialista,
@@ -92,6 +104,30 @@ SELECT consulta.id as IdConsulta,
         paciente.riesgo as RiesgoPaciente,
         paciente.prioridad as PrioridadPaciente    
 FROM consulta
-INNER JOIN paciente ON paciente.id = consulta.paciente;
+INNER JOIN paciente ON paciente.id = consulta.paciente
+WHERE consulta.estado = 1;
+
+
+# En espera
+
+SELECT * FROM ingresados;
+SELECT * FROM paciente;
+
+# Pacientes ingresados ordenados por prioridad
+SELECT 
+	ingresados.idPaciente as IdPaciente,
+    paciente.nombre as NombrePaciente,
+    paciente.edad as NombreEdad,
+    paciente.noHistoriaClinica as NumeroHistoriaClinica,
+    paciente.riesgo as RiesgoPaciente,
+    paciente.prioridad as PrioridadPaciente
+FROM ingresados
+INNER JOIN paciente ON paciente.id = ingresados.idPaciente
+ORDER BY paciente.prioridad DESC;
+    
+    
+
+
+
 
 

@@ -1,5 +1,5 @@
 $(".tabla").DataTable({
-    //Lenguaje Español Funcionando
+    //Lenguaje Español
    
     language : {
         "sProcessing":     "Procesando...",

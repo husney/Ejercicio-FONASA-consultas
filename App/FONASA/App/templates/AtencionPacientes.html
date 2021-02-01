@@ -2,22 +2,126 @@
 
 {% block title %}Atención Pacientes{% endblock %}
 
+{% block head %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css"> 
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css')}}">
+{% endblock %}
+
 {% block body %}
     
     <div class="w-100 mt-5 row">
         <form   method="POST" class="w-100"  id="form-atencionPacientes">
             
-            <div class="column-12 d-flex justify-content-end">
-                <div class="row d-flex align-items-center justify-content-end w-50">
-                    <label for="cantidadConsultasLbl" class="mr-1">Cantidad consultas</label>
-                    <input type="number" name="cantidadConsultas" id="cantidadConsultas" class="form-control w-25 d-inline-block mr-1">
-                    <a href="javascript:void(0);" class="btn btn-success" id="btnAsignarCantidad">Asignar</a>
-                </div>
-            </div>            
-        </form>
-    </div>
+            
+            <div class="row">
+                
+                <div class="col-4 d-flex justify-content-start w-100">
+                    <label>Consultas libres: <span id="consultasLibres"></span></label>
+                </div> 
 
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/atencionPacientes.js') }}"></script>
+                <div class="col-8 d-flex justify-content-end w-100">
+                  
+                    <div class="row d-flex align-items-center justify-content-end w-50  ">                    
+                            <label for="cantidadConsultas" class="mr-1">
+                                <input type="checkbox" class="form-check-input mb-3" id="modificarCantidadConsutlas">
+                                Cantidad consultas</label>
+                            <input type="number" name="cantidadConsultas" id="cantidadConsultas" class="form-control w-25 d-inline-block mr-1" readonly>
+                            <a href="javascript:void(0);" class="btn btn-success disabled " id="btnAsignarCantidad" disabled >Asignar</a>
+                        </div>
+                    </div>
+                </div> 
+            </div>
+        </form>
+
+          <!-- Boton para el modal asignar consulta -->
+        <div class="row d-flex justify-content-end my-3">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalAsignarConsulta">Asignar consulta</button>
+        </div>
+
+        <!-- Modal asignar consulta -->
+        <div class="modal fade" id="modalAsignarConsulta" tabindex="-1" aria-labelledby="modalAsignarConsultaLabel" aria-hidden="true">
+            <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="modalAsignarConsultaLabel">Asignar Consulta</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="nombre">Nombre</label>
+                        <input type="text" class="form-control" id="nombre">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <fieldset>
+            <legend class="w-100 d-flex justify-content-center h2">En consulta</legend>
+            <table class="tabla table-dark table table-striped table-hover table-bordered rounded mt-3" id="table-consultas-actuales">
+                <thead class="text-center">                            
+                    <th>Prioridad</th>
+                    <th>Paciente</th>
+                    <th>Especialista</th>
+                    <th>Despacho</th>
+                </thead>
+                <tfoot class="text-center">
+                    <tr>
+                        <th colspan="4">PACIENTES EN CONSULTA</th>
+                    </tr>
+                </tfoot>
+                <tbody id="table-consultas-actuales-body" class="text-center">
+                </tbody>                        
+            </table>
+        </fieldset>
+
+        <hr>
+
+        <fieldset>
+            <legend class="w-100 d-flex justify-content-center h2">En espera</legend>
+            <table class="tabla table-dark table table-striped table-hover table-bordered rounded mt-3" id="table-espera-actuales">
+                <thead class="text-center">                            
+                    <th>Paciente</th>
+                    <th>Prioridad</th>
+                    <th>Tipo consulta</th>
+                    <th>Especialista</th>
+                    <th>Asignar consulta</th>
+                </thead>
+                <tfoot class="text-center">
+                    <tr>
+                        <th colspan="5">PACIENTES EN ESPERA</th>
+                    </tr>
+                </tfoot>
+                <tbody id="table-espera-body" class="text-center">
+                </tbody>                        
+            </table>
+        </fieldset>
+           
+        
+          
+           
+            
+            
+                    
+        
+        <!-- Jquery Datatables -->
+        <!-- <script src="https://code.jquery.com/jquery-3.5.1.js"></script> -->
+        <script type="text/javascript" src="{{ url_for('static', filename='Bootstrap/jquery-3.5.1.slim.min.js') }}"></script>
+        <!-- Datatables compatible con boostrap -->
+        <script src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.10.23/js/dataTables.bootstrap4.min.js"></script>    
+        <script src="{{ url_for('static', filename='js/dataTable.js')}}"></script>
+        
+        <!-- Axios JS -->
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script src="{{ url_for('static', filename='js/atencionPacientes.js')}}"></script>
+    
 {% endblock %}
     

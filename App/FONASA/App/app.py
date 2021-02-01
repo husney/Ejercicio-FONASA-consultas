@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify, url_for, redirect, render_template, r
 from database import mysql, dbInfo
 from data import Cursor
 from paciente import Paciente
-from OperacionesEnum import Operacion
+from OperacionesEnum import Operacion, Consultas
 
 
 app = Flask(__name__)
@@ -296,6 +296,10 @@ def eliminarPaciente(id):
 @app.route('/atencionPacientes')
 def atencionPacientes():
     return render_template('AtencionPacientes.html')
+
+@app.route('/ingresarPaciente')
+def ingresarPaciente():
+    return render_template('IngresoPaciente.html')
     
     
 from flask_restful import Resource, Api
@@ -349,6 +353,122 @@ class cantidadConsultas(Resource):
             return jsonify({"Estado":"Cantidad actualizada"})
 
 api.add_resource(cantidadConsultas, '/cantidadConsultas')
+
+class enConsulta(Resource):
+    def get(self):
+        with Cursor(mysql) as db:
+            db.callproc('sp_Consultas', [Consultas.enEspera.value,None,])
+            datos = db.fetchone()
+            return jsonify({'enEspera':datos[0]})
+            
+            
+api.add_resource(enConsulta, '/enConsulta')
+
+
+class consultasActuales(Resource):
+    def get(self):
+        with Cursor(mysql) as db:
+            db.callproc('sp_Consultas',[Consultas.enConsulta.value, None])
+            consultas = db.fetchall()
+            datos = []
+            for consulta in consultas:
+                consul = {
+                    'idConsulta': consulta[0],
+                    'cantidadPacientes': consulta[1],
+                    'nombreEspecialista': consulta[2],
+                    'idPaciente': consulta[3],
+                    'hospital' : consulta[4],
+                    'tipoConsulta' : consulta[5],
+                    'estado' : consulta[6],
+                    'nombrePaciente' : consulta[7],
+                    'edadPaciente' : consulta[8],
+                    'riesgoPaciente' : consulta[9],
+                    'prioridadPaciente' : consulta[10]
+                }
+                datos.append(consul)
+            return jsonify(datos)
     
+api.add_resource(consultasActuales, '/consultasActuales')
+
+class consultarPacientes(Resource):
+    def get(self):
+         with Cursor(mysql) as db:
+            db.callproc('crudPaciente', [Operacion.seleccionarTodos.value,
+                                        None,
+                                        None,
+                                        None,
+                                        None,
+                                        None,
+                                        None])
+            pacientes = db.fetchall()
+            datos = []
+            for paciente in pacientes:
+                pac = {
+                    'id' : paciente[0],
+                    'nombre' : paciente[1],
+                    'edad' : paciente[2],
+                    'noHistoriaClinica' : paciente[3],
+                    'prioridad' : paciente[4],
+                    'riesgo' : paciente[5]
+                }
+                datos.append(pac)
+            return datos
+        
+    def post(self):
+        with Cursor(mysql) as db:
+            db.callproc('sp_Ingresados', (Operacion.insertar.value, request.json['paciente']))
+            return jsonify({"Estado":"Ingresado"})
+        
+api.add_resource(consultarPacientes, '/consultarPacientes')
+
+class consultarPacientesEspera(Resource):
+    
+    def get(self):
+        with Cursor(mysql) as db:
+            db.callproc('sp_Ingresados', (Consultas.enEspera.value, None))
+            pacientes = db.fetchall()
+            datos = []
+            for paciente in pacientes:
+                pac = {
+                    'id': paciente[0],
+                    'nombre' : paciente[1],
+                    'edad' : paciente[2],
+                    'noHistoriaClinica' : paciente[3],
+                    'riesgo' : paciente[4],
+                    'prioridad' : paciente[5]
+                }
+                datos.append(pac)
+            return jsonify(datos)
+        
+    def delete(self):
+        with Cursor(mysql) as db:
+            db.callproc('sp_Ingresados', (Operacion.eliminar.value, request.json['paciente']))
+            return jsonify({"estado":"Ingreso eliminado"})
+
+api.add_resource(consultarPacientesEspera, '/pacientesEspera')
+
+
+class ConsultasPacientes(Resource):
+    
+    def post(self):
+        with Cursor(mysql) as db:
+            try:
+                db.callproc('sp_ConsultasPaciente', (Operacion.insertar.value, None,request.json['cantidadPacientes'], request.json['nombreEspecialista'], request.json['paciente'], request.json['hospital'], request.json['tipoConsulta'], request.json['estado']))
+                respuesta = db.fetchone()
+                return jsonify({"estado":"Consulta registrada"})
+            except Exception as ex:
+                return jsonify({"estado":"Error al registrar consulta"})
+        
+    def delete(self):
+        with Cursor(mysql) as db:
+            try:
+                db.callproc('sp_ConsultasPaciente', (Operacion.eliminar.value, None, None, None, request.json['paciente'],None, None, None))
+                return jsonify({"estado":"Consulta eliminada"})
+            except Exception as ex:
+                return jsonify({"estado":"Error al eliminar la consulta"})
+            
+    
+api.add_resource(ConsultasPacientes, '/consultasPacientes')
+
 if __name__ == ('__main__'):
     app.run(debug=True)
