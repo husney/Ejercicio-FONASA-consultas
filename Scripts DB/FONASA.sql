@@ -2,6 +2,32 @@ CREATE DATABASE IF NOT EXISTS FONASA;
 
 USE FONASA;
 
+SELECT * FROM registroConsultas;
+CREATE TABLE registroConsultas(
+id INT AUTO_INCREMENT PRIMARY KEY,
+cantidadPacientes INT,
+nombreEspecialista VARCHAR(100),
+paciente INT,
+hospital INT,
+tipoConsulta INT,
+fechaInicio DATETIME, 
+fechaFin DATETIME DEFAULT CURRENT_TIMESTAMP,
+idConsulta INT,
+
+CONSTRAINT fk_registroConsulta_paciente
+	FOREIGN KEY (paciente) REFERENCES paciente(id)
+		ON DELETE CASCADE,
+CONSTRAINT fk_registroConsulta_hospital
+	FOREIGN KEY (hospital) REFERENCES hospital(id),
+CONSTRAINT fk_registroConsulta_tipoConsulta
+	FOREIGN KEY (tipoConsulta) REFERENCES tipoConsulta(id),
+CONSTRAINT fk_registroConsulta_idConsulta
+    FOREIGN KEY (idConsulta) REFERENCES consulta(id)
+);
+
+ALTER TABLE registroConsultas DROP CONSTRAINT fk_registroConsulta_paciente;
+
+
 CREATE TABLE IF NOT EXISTS Paciente(
 id INT AUTO_INCREMENT PRIMARY KEY,
 nombre VARCHAR(100) NOT NULL,
@@ -55,14 +81,18 @@ nombre VARCHAR(150) NOT NULL,
 fechaCreacion DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+DROP TABLE Consulta;
+
+
 CREATE TABLE IF NOT EXISTS Consulta(
 id INT AUTO_INCREMENT PRIMARY KEY,
 cantidadPacientes INT,
 nombreEspecialista VARCHAR(100),
-paciente INT NOT NULL,
+paciente INT ,
 hospital INT NOT NULL,
-tipoConsulta INT NOT NULL,
+tipoConsulta INT ,
 estado INT NOT NULL,
+fechaInicio DATETIME ,
 CONSTRAINT fk_Consulta_TipoConsulta
 	FOREIGN KEY (tipoConsulta) REFERENCES TipoConsulta(id),
 CONSTRAINT fk_Consulta_Estado
@@ -86,7 +116,12 @@ VALUES ('Pediatría'),('Urgencia'),('CGI'); /* CGI === Consulta General Integral
 INSERT INTO Estado(descripcion)
 VALUES ('Ocupada'), ('En espera');
 
-
+CREATE TABLE ingresados(
+id INT,
+idPaciente INT,
+CONSTRAINT fk_ingresados_paciente
+	FOREIGN KEY (idPaciente) REFERENCES Paciente(id)
+);
 
 
 

@@ -35,6 +35,8 @@ BEGIN
 END//
 DELIMITER ;
 
+CALL crudPacienteAnciano(4,null, 56);
+
 SELECT * FROM Paciente;
 SELECT * FROM PAnciano;
 DELETE FROM PAnciano;

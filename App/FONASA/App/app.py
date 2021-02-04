@@ -1,9 +1,9 @@
-from flask import Flask, request, jsonify, url_for, redirect, render_template, request
+from flask import Flask, request, jsonify, url_for, redirect, render_template, request, session
 #from flask_mysqldb import MySQL
 from database import mysql, dbInfo
 from data import Cursor
 from paciente import Paciente
-from OperacionesEnum import Operacion, Consultas
+from OperacionesEnum import Operacion, Consultas, Informes
 
 
 app = Flask(__name__)
@@ -59,13 +59,13 @@ def guardarPacienteDB(paciente):
     # Guarda un paciente en la base de datos
     
     with Cursor(mysql) as db:
-        db.callproc('crudPaciente', [Operacion.insertar.value,
+        db.callproc('crudPaciente', (Operacion.insertar.value,
                                     None,
                                     paciente.getNombre(),
                                     paciente.getEdad(),
                                     paciente.getNoHistoriaClinica(),
                                     paciente.getPrioridad(),
-                                    paciente.getRiesgo()])
+                                    paciente.getRiesgo()))
         pacId = db.fetchone()[0]
     datosAdicionalesPaciente(paciente, pacId)
 
@@ -74,13 +74,13 @@ def actualizarPacienteDB(paciente):
     # Actualiza un paciente en la base de datos
     
     with Cursor(mysql) as db:
-        db.callproc('crudPaciente', [Operacion.actualizar.value,
+        db.callproc('crudPaciente', (Operacion.actualizar.value,
                                     paciente.getId(),
                                     paciente.getNombre(),
                                     paciente.getEdad(),
                                     paciente.getNoHistoriaClinica(),
                                     paciente.getPrioridad(),
-                                    paciente.getRiesgo()])
+                                    paciente.getRiesgo()))
     eliminarReferencias(paciente.getId() )
     datosAdicionalesPaciente(paciente, paciente.getId())
 
@@ -92,20 +92,20 @@ def datosAdicionalesPaciente(paciente, pacId):
 
     with Cursor(mysql) as db:
         if (edad > 0 and edad < 16):
-            db.callproc('crudPacienteNinno', [Operacion.insertar.value,
+            db.callproc('crudPacienteNinno', (Operacion.insertar.value,
                                                    paciente.getPesoEstatura(),
-                                                   pacId])
+                                                   pacId))
 
         elif (edad > 15 and edad < 41):
-            db.callproc('crudPacienteJoven', [Operacion.insertar.value,
+            db.callproc('crudPacienteJoven', (Operacion.insertar.value,
                                               paciente.getFumador(),
                                               paciente.getTiempoFumador(),
-                                              pacId])
+                                              pacId))
 
         elif (edad > 40):
-            db.callproc('crudPacienteAnciano', [Operacion.insertar.value,
+            db.callproc('crudPacienteAnciano', (Operacion.insertar.value,
                                                 paciente.getDieta(),
-                                                pacId])
+                                                pacId))
 
 # def datosAdicionalesPacienteUpdate(paciente, pacId):
     
@@ -143,19 +143,19 @@ def eliminarRefrenciaNino(id):
     # Elimina los registros de un paciente en la tabla PNinno
     
     with Cursor(mysql) as db:
-        db.callproc('crudPacienteNinno', [Operacion.eliminar.value,
+        db.callproc('crudPacienteNinno', (Operacion.eliminar.value,
                                           None,
-                                          id])
+                                          id))
 
 def eliminarRefrenciaJoven(id):
     
     # Elimina los registros de un paciente en la tabla PJoven
     
     with Cursor(mysql) as db:
-        db.callproc('crudPacienteJoven', [Operacion.eliminar.value,
+        db.callproc('crudPacienteJoven', (Operacion.eliminar.value,
                                           None,
                                           None,
-                                          id])
+                                          id))
 
 def eliminarRefrenciaAnciano(id):
     
@@ -171,14 +171,14 @@ def modelarPacienteObject(id):
     #Consulta un paciente y lo transofmra en un objeto Paciente
 
     with Cursor(mysql) as db:
-        db.callproc('crudPaciente', [Operacion.seleccionarById.value,
+        db.callproc('crudPaciente', (Operacion.seleccionarById.value,
                                      id,
                                      None,
                                      None,
                                      None,
                                      None,
                                      None
-                                     ])
+                                    ))
 
         datos = db.fetchone()
 
@@ -192,17 +192,17 @@ def modelarPacienteObject(id):
         
         if (edad > 0 and edad < 16):
 
-            db.callproc('crudPacienteNinno', [Operacion.seleccionarById.value,
+            db.callproc('crudPacienteNinno', (Operacion.seleccionarById.value,
                                                 None,
-                                                id])
+                                                id))
             
             paciente.setPesoEstatura(db.fetchone()[1])
 
         elif (edad > 15 and edad < 41):
-            db.callproc('crudPacienteJoven', [Operacion.seleccionarById.value,
+            db.callproc('crudPacienteJoven', (Operacion.seleccionarById.value,
                                               None,
                                               None,
-                                              id])
+                                              id))
 
             datosFumador = db.fetchone()
             
@@ -212,9 +212,9 @@ def modelarPacienteObject(id):
                 paciente.setTiempoFumador(datosFumador[2])
 
         elif (edad > 40):
-            db.callproc('crudPacienteAnciano', [Operacion.seleccionarById.value,
+            db.callproc('crudPacienteAnciano', (Operacion.seleccionarById.value,
                                                 None,
-                                                id])
+                                                id))
 
             datos = db.fetchone()
             if(datos[0]):
@@ -228,13 +228,13 @@ def listarPacientes():
     # Obitene todos los pacientes de la Base de datos
     
     with Cursor(mysql) as db:
-        db.callproc('crudPaciente', [Operacion.seleccionarTodos.value,
+        db.callproc('crudPaciente', (Operacion.seleccionarTodos.value,
                                      None,
                                      None,
                                      None,
                                      None,
                                      None,
-                                     None])
+                                     None))
         datos = db.fetchall()
         pacientes = []
         for paciente in datos:
@@ -250,13 +250,13 @@ def eliminarPacienteDB(id):
     
     eliminarReferencias(id)
     with Cursor(mysql) as db:
-        db.callproc('crudPaciente', [Operacion.eliminar.value,
+        db.callproc('crudPaciente', (Operacion.eliminar.value,
                                      id,
                                      None,
                                      None,
                                      None,
                                      None,
-                                     None])
+                                     None))
         
 
 @app.route('/pacientes/ok')
@@ -310,26 +310,29 @@ class pacientesApi(Resource):
     
     def get(self):
         with Cursor(mysql) as db:
-            db.callproc('crudPaciente', [Operacion.seleccionarTodos.value,
+            try:
+                db.callproc('crudPaciente', (Operacion.seleccionarTodos.value,
                                         None,
                                         None,
                                         None,
                                         None,
                                         None,
-                                        None])
-            datos = db.fetchall()
-            pacientes = []
-            for paciente in datos:
-                pac = {
-                    "id" : paciente[0],
-                    "nombre" : paciente[1],
-                    "edad" : paciente[2],
-                    "noHistoriaClinica" : paciente[3],
-                    "prioridad" : paciente[4],
-                    "riesgo" : paciente[5]
-                }
-                pacientes.append(pac)
-            return jsonify(pacientes)
+                                        None))
+                datos = db.fetchall()
+                pacientes = []
+                for paciente in datos:
+                    pac = {
+                        "id" : paciente[0],
+                        "nombre" : paciente[1],
+                        "edad" : paciente[2],
+                        "noHistoriaClinica" : paciente[3],
+                        "prioridad" : float(str(paciente[4])),
+                        "riesgo" : float(str(paciente[5]))
+                    }
+                    pacientes.append(pac)
+                return jsonify(pacientes)
+            except Exception as ex:
+                return jsonify({"estado": f"Error al realizar la consulta {ex}"})
     
 api.add_resource(pacientesApi, '/pacientesBusqueda')
 
@@ -337,29 +340,43 @@ class cantidadConsultas(Resource):
     
     def get(self):
         with Cursor(mysql) as db:
-            db.callproc('sp_Consultas', (Operacion.seleccionarTodos.value,None))
-            datos = db.fetchone()
-            return jsonify({"cantidad":datos[0]})
+            try:
+                db.callproc('sp_Consultas', (Operacion.seleccionarTodos.value,None))
+                datos = db.fetchone()
+                return jsonify({"cantidad":datos[0]})
+            except Exception as ex:
+                return jsonify({"estado": f"error al realizar la consulta {ex}"})
     
     
     def post(self):
         with Cursor(mysql) as db:
-            db.callproc('sp_Consultas', (Operacion.insertar.value,request.json['cantidad']))
-            return jsonify({"Estado":"Cantidad guardada"})
+            try:
+                db.callproc('sp_Consultas', (Operacion.insertar.value,request.json['cantidad']))
+                return jsonify({"Estado":"Cantidad guardada"})
+            except Exception as ex:
+                return jsonify({"estado": f"error al guardar {ex}"})
+            
 
     def put(self):
         with Cursor(mysql) as db:
-            db.callproc('sp_Consultas', (Operacion.actualizar.value, request.json['cantidad']))
-            return jsonify({"Estado":"Cantidad actualizada"})
+            try:
+                db.callproc('sp_Consultas', (Operacion.actualizar.value, request.json['cantidad']))
+                return jsonify({"Estado":"Cantidad actualizada"})
+            except Exception as ex:
+                return jsonify({"estado": f"error al actualizar {ex}"})
 
 api.add_resource(cantidadConsultas, '/cantidadConsultas')
 
 class enConsulta(Resource):
     def get(self):
         with Cursor(mysql) as db:
-            db.callproc('sp_Consultas', [Consultas.enEspera.value,None,])
-            datos = db.fetchone()
-            return jsonify({'enEspera':datos[0]})
+            try:
+                db.callproc('sp_Consultas', [Consultas.enEspera.value,None,])
+                datos = db.fetchone()
+                return jsonify({'enEspera':datos[0]})
+            except Exception as ex:
+                return jsonify({"estado": f"error al realizar la consulta {ex}"})
+            
             
             
 api.add_resource(enConsulta, '/enConsulta')
@@ -368,107 +385,227 @@ api.add_resource(enConsulta, '/enConsulta')
 class consultasActuales(Resource):
     def get(self):
         with Cursor(mysql) as db:
-            db.callproc('sp_Consultas',[Consultas.enConsulta.value, None])
-            consultas = db.fetchall()
-            datos = []
-            for consulta in consultas:
-                consul = {
-                    'idConsulta': consulta[0],
-                    'cantidadPacientes': consulta[1],
-                    'nombreEspecialista': consulta[2],
-                    'idPaciente': consulta[3],
-                    'hospital' : consulta[4],
-                    'tipoConsulta' : consulta[5],
-                    'estado' : consulta[6],
-                    'nombrePaciente' : consulta[7],
-                    'edadPaciente' : consulta[8],
-                    'riesgoPaciente' : consulta[9],
-                    'prioridadPaciente' : consulta[10]
-                }
-                datos.append(consul)
-            return jsonify(datos)
+            try:
+                db.callproc('sp_Consultas',[Consultas.enConsulta.value, None])
+                consultas = db.fetchall()
+                datos = []
+                for consulta in consultas:
+                    consul = {
+                        'idConsulta': consulta[0],
+                        'cantidadPacientes': consulta[1],
+                        'nombreEspecialista': consulta[2],
+                        'idPaciente': consulta[3],
+                        'hospital' : consulta[4],
+                        'tipoConsulta' : consulta[5],
+                        'estado' : consulta[6],
+                        'fechaInicio' : consulta[7],
+                        'nombrePaciente' : consulta[8],
+                        'edadPaciente' : consulta[9],
+                        'riesgoPaciente' : float(str(consulta[10])),
+                        'prioridadPaciente' : float(str(consulta[11])),
+                        'idTipoConsulta' : consulta[12]
+                    }
+                    datos.append(consul)
+                return jsonify(datos)
+            except Exception as ex:
+                return jsonify({"estado": f"Error al realizar la consulta {ex}"})
     
-api.add_resource(consultasActuales, '/consultasActuales')
+
 
 class consultarPacientes(Resource):
     def get(self):
          with Cursor(mysql) as db:
-            db.callproc('crudPaciente', [Operacion.seleccionarTodos.value,
-                                        None,
-                                        None,
-                                        None,
-                                        None,
-                                        None,
-                                        None])
-            pacientes = db.fetchall()
-            datos = []
-            for paciente in pacientes:
-                pac = {
-                    'id' : paciente[0],
-                    'nombre' : paciente[1],
-                    'edad' : paciente[2],
-                    'noHistoriaClinica' : paciente[3],
-                    'prioridad' : paciente[4],
-                    'riesgo' : paciente[5]
-                }
-                datos.append(pac)
-            return datos
+            try:
+                db.callproc('sp_Ingresados', (Operacion.seleccionarTodos.value, None))
+                pacientes = db.fetchall()
+                datos = []
+                for paciente in pacientes:
+                    pac = {
+                        'id' : paciente[0],
+                        'nombre' : paciente[1],
+                        'noHistoriaClinica' : paciente[2],
+                        'edad' : paciente[3],
+                        'riesgo' : float(str(paciente[4])),
+                        'prioridad' : float(str(paciente[5]))
+                    }
+                    datos.append(pac)
+                return datos
+            except Exception as ex:
+                return jsonify({"estado": f"Error al realizar la consulta {ex}"})
         
     def post(self):
         with Cursor(mysql) as db:
-            db.callproc('sp_Ingresados', (Operacion.insertar.value, request.json['paciente']))
-            return jsonify({"Estado":"Ingresado"})
+            try:
+                db.callproc('sp_Ingresados', (Operacion.insertar.value, request.json['paciente']))
+                return jsonify({"Estado":"Ingresado"})
+            except Exception as ex:
+                return jsonify({"estado": f"Error al guardar {ex}"})
         
-api.add_resource(consultarPacientes, '/consultarPacientes')
 
 class consultarPacientesEspera(Resource):
     
     def get(self):
         with Cursor(mysql) as db:
-            db.callproc('sp_Ingresados', (Consultas.enEspera.value, None))
-            pacientes = db.fetchall()
-            datos = []
-            for paciente in pacientes:
-                pac = {
-                    'id': paciente[0],
-                    'nombre' : paciente[1],
-                    'edad' : paciente[2],
-                    'noHistoriaClinica' : paciente[3],
-                    'riesgo' : paciente[4],
-                    'prioridad' : paciente[5]
-                }
-                datos.append(pac)
-            return jsonify(datos)
+            try:
+                db.callproc('sp_Ingresados', (Consultas.enEspera.value, None))
+                pacientes = db.fetchall()
+                datos = []
+                for paciente in pacientes:
+                    pac = {
+                        'id': paciente[0],
+                        'fechaIngreso' : paciente[1],
+                        'nombre' : paciente[2],
+                        'edad' : paciente[3],
+                        'noHistoriaClinica' : paciente[4],
+                        'riesgo' : float(str( paciente[5])),
+                        'prioridad' : float(str(paciente[6]))
+                    }
+                    datos.append(pac)
+                return jsonify(datos)
+            except Exception as ex:
+                return jsonify({"estado": f"Error al realizar la consulta {ex}"})
         
     def delete(self):
         with Cursor(mysql) as db:
-            db.callproc('sp_Ingresados', (Operacion.eliminar.value, request.json['paciente']))
-            return jsonify({"estado":"Ingreso eliminado"})
-
-api.add_resource(consultarPacientesEspera, '/pacientesEspera')
+            try:
+                db.callproc('sp_Ingresados', (Operacion.eliminar.value, request.json['paciente']))
+                return jsonify({"estado":"Ingreso eliminado"})
+            except Exception as ex:
+                return jsonify({"estado": f"Error al eliminar {ex}"})
 
 
 class ConsultasPacientes(Resource):
     
+    def get(self):
+        with Cursor(mysql) as db:
+            try:
+                paciente = request.args.get('paciente')
+                db.callproc('sp_ConsultasPaciente', (Operacion.seleccionarById.value, None, None, None, paciente, None, None, None, None))
+                respuesta = db.fetchone() 
+                if respuesta is not None:
+                    return jsonify({"estado":respuesta[0]})
+            except Exception as ex:
+                return jsonify({"estado": f"Error al validar la consulta {ex}"})
+    
     def post(self):
         with Cursor(mysql) as db:
             try:
-                db.callproc('sp_ConsultasPaciente', (Operacion.insertar.value, None,request.json['cantidadPacientes'], request.json['nombreEspecialista'], request.json['paciente'], request.json['hospital'], request.json['tipoConsulta'], request.json['estado']))
+                db.callproc('sp_ConsultasPaciente', (Operacion.insertar.value, None,request.json['cantidadPacientes'], request.json['nombreEspecialista'], request.json['paciente'], request.json['hospital'], request.json['tipoConsulta'], request.json['estado'], None))
                 respuesta = db.fetchone()
                 return jsonify({"estado":"Consulta registrada"})
             except Exception as ex:
                 return jsonify({"estado":"Error al registrar consulta"})
-        
-    def delete(self):
+            
+    def put(self):
         with Cursor(mysql) as db:
             try:
-                db.callproc('sp_ConsultasPaciente', (Operacion.eliminar.value, None, None, None, request.json['paciente'],None, None, None))
-                return jsonify({"estado":"Consulta eliminada"})
+                db.callproc('sp_ConsultasPaciente', (Operacion.actualizar.value, None,request.json['cantidadPacientes'], request.json['nombreEspecialista'], request.json['paciente'], request.json['hospital'], request.json['tipoConsulta'], request.json['estado'], None))
+                return jsonify({"estado": "consulta registrada"})
             except Exception as ex:
-                return jsonify({"estado":"Error al eliminar la consulta"})
-            
+                return jsonify({"estado": f"Error al modificar la consulta {ex}"})
+
+class LiberarConsultas(Resource):
     
+    def put(self):
+        with Cursor(mysql) as db:
+            try:
+                db.callproc('sp_ConsultasPaciente', (Consultas.eliminarConsulta.value, request.json['consulta'], None, None, None,None, None, None, None))
+                return jsonify({"estado": "Consulta eliminada"})
+            except Exception as ex:
+                return jsonify({"estado": f"Error al eliminar la consulta {ex}"})
+
+class BitacoraConsultas(Resource):
+
+    def post(self):
+        with Cursor(mysql) as db:
+            try:
+                db.callproc('sp_ConsultasPaciente', (Consultas.registroConsultaBitacora.value, request.json['consulta'], request.json['cantidadPacientes'], request.json['nombreEspecialista'], request.json['paciente'], request.json['hospital'], request.json['tipoConsulta'], None, request.json['fechaInicio']))
+                return jsonify({"estado": "Consulta registrada en el historial"})
+            except Exception as ex:
+                return jsonify({"estado": f"Error al registrar la consulta {ex}"})
+
+class InfConsultaMasAtendida(Resource):
+    
+    def get(self):
+        with Cursor(mysql) as db:
+            try:
+                db.callproc('sp_Informes', (Informes.consultaMasAtendida.value, None))
+                datos = db.fetchone()
+                consulta = {
+                    "consulta" : datos[0],
+                    "cantidad" : datos[1]
+                }
+                return jsonify(consulta)
+            except Exception as ex:
+                return jsonify({"estado": f"Error al realizar la consulta {ex}"})
+
+class LiberarTodasConsultas(Resource):
+    
+    def put(self):
+        with Cursor(mysql) as db:
+            try:
+                db.callproc('sp_ConsultasPaciente', (Consultas.liberarTodas.value, None, None, None, None,None, None, None, None))
+                return jsonify({"estado": "Consultas liberadas"})
+            except Exception as ex:
+                return jsonify({"estado": f"Error al liberar las consultas {ex}"})
+
+class PacienteMasAnciano(Resource):
+    
+    def get(self):
+        with Cursor(mysql) as db:
+            try:
+                db.callproc('sp_Informes', (Informes.pacienteMasAnciano.value, None))
+                datos = db.fetchone()
+                paciente = {
+                    'id': datos[0],
+                    'fechaIngreso' : datos[1],
+                    'nombre' : datos[2],
+                    'edad' : datos[3],
+                    'noHistoriaClinica' : datos[4],
+                    'riesgo' : float(str(datos[5])),
+                    'prioridad' : float(str(datos[6]))
+                }
+                return jsonify(paciente);
+            except Exception as ex:
+                return jsonify({"estado": f"Error al consultar paciente {ex}"})
+
+class PacientesBusquedaHistoriaclinica(Resource):
+    
+    def get(self):
+        with Cursor(mysql) as db:
+            try:
+                noHistoriaClinica = request.args.get('noHistoriaClinica')
+                db.callproc('sp_Informes', (Informes.pacientesMayorRiesgo.value, noHistoriaClinica))
+                pacientes = db.fetchall()
+                datos = []
+                for paciente in pacientes:
+                    pac = {
+                        'id': paciente[0],
+                        'fechaIngreso': paciente[1],
+                        'nombre': paciente[2],
+                        'edad': paciente[3],
+                        'noHistoriaClinica': paciente[4],
+                        'riesgo': float(str(paciente[5])),
+                        'prioridad': float(str(paciente[6]))
+                    }
+                    datos.append(pac)
+                return jsonify(datos)
+                return jsonify(pacientes)
+            except Exception as ex:
+                return jsonify({"estado" : f"Error al consultar pacientes {ex}"})
+            
+            
+# Endpoints
+api.add_resource(consultasActuales, '/consultasActuales')
+api.add_resource(consultarPacientes, '/consultarPacientes')
+api.add_resource(consultarPacientesEspera, '/pacientesEspera')
 api.add_resource(ConsultasPacientes, '/consultasPacientes')
+api.add_resource(LiberarConsultas, '/LiberarConsutlas')
+api.add_resource(BitacoraConsultas, '/bitacoraConsultas')            
+api.add_resource(InfConsultaMasAtendida, '/InfConsultaMasAtendida')
+api.add_resource(LiberarTodasConsultas, '/liberarTodasConsultas')
+api.add_resource(PacienteMasAnciano, '/PacienteMasAnciano')
+api.add_resource(PacientesBusquedaHistoriaclinica, '/pacientesHistoriaClinica')
 
 if __name__ == ('__main__'):
     app.run(debug=True)

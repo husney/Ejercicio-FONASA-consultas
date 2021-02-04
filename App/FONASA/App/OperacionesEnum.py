@@ -10,4 +10,13 @@ class Operacion(Enum):
     
 class Consultas(Enum):
     enEspera = 5
-    enConsulta = 6
+    enConsulta = 6    
+    eliminarConsulta = 7
+    registroConsultaBitacora = 8
+    liberarTodas = 9
+    
+
+class Informes(Enum):
+    pacientesMayorRiesgo = 1
+    consultaMasAtendida = 2
+    pacienteMasAnciano = 3

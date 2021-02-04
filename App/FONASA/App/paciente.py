@@ -122,7 +122,7 @@ class Paciente():
         
         riesgo = None
         
-        if self.__edad <42:
+        if self.__edad <41:
             riesgo = (self.__edad * self.__prioridad) / 100
         else:
             riesgo = ((self.__edad * self.__prioridad) / 100) + 5.3

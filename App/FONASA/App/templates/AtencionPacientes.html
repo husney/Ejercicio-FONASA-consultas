@@ -17,7 +17,7 @@
             <div class="row">
                 
                 <div class="col-4 d-flex justify-content-start w-100">
-                    <label>Consultas libres: <span id="consultasLibres"></span></label>
+                    <label>Consultas libres: <b><span id="consultasLibres"></span></b></label>
                 </div> 
 
                 <div class="col-8 d-flex justify-content-end w-100">
@@ -34,13 +34,23 @@
             </div>
         </form>
 
-          <!-- Boton para el modal asignar consulta -->
-        <div class="row d-flex justify-content-end my-3">
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalAsignarConsulta">Asignar consulta</button>
+        <div class="row d-flex justify-content-between">
+            <div>
+                <p>Consulta que más ha atendido: <b><span id="consulta-mas-atendida"></span></p>
+                <!-- </b> cantidad: <b><span id="cantidad-consultas-atendidas"></span></b> -->
+            </div>
+            <div class="mt-2 mr-3">
+                <a href="javascript:void(0);" class="btn btn-warning" id="btnLiberarConsultas"><b>Liberar consultas</b></a>
+            </div>
         </div>
 
+          <!-- Boton para el modal asignar consulta -->
+        <!-- <div class="row d-flex justify-content-end my-3">
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalAsignarConsulta">Asignar consulta</button>
+        </div> -->
+
         <!-- Modal asignar consulta -->
-        <div class="modal fade" id="modalAsignarConsulta" tabindex="-1" aria-labelledby="modalAsignarConsultaLabel" aria-hidden="true">
+        <!-- <div class="modal fade" id="modalAsignarConsulta" tabindex="-1" aria-labelledby="modalAsignarConsultaLabel" aria-hidden="true">
             <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -61,20 +71,21 @@
                 </div>
             </div>
             </div>
-        </div>
+        </div> -->
 
         <fieldset>
             <legend class="w-100 d-flex justify-content-center h2">En consulta</legend>
             <table class="tabla table-dark table table-striped table-hover table-bordered rounded mt-3" id="table-consultas-actuales">
                 <thead class="text-center">                            
                     <th>Prioridad</th>
-                    <th>Paciente</th>
+                    <th>Paciente</th>                    
                     <th>Especialista</th>
+                    <th>Tipo Consulta</th>
                     <th>Despacho</th>
                 </thead>
                 <tfoot class="text-center">
                     <tr>
-                        <th colspan="4">PACIENTES EN CONSULTA</th>
+                        <th colspan="5">PACIENTES EN CONSULTA</th>
                     </tr>
                 </tfoot>
                 <tbody id="table-consultas-actuales-body" class="text-center">
@@ -89,21 +100,77 @@
             <table class="tabla table-dark table table-striped table-hover table-bordered rounded mt-3" id="table-espera-actuales">
                 <thead class="text-center">                            
                     <th>Paciente</th>
+                    <th>Edad</th>
                     <th>Prioridad</th>
+                    <th>Historia clinica</th>
                     <th>Tipo consulta</th>
                     <th>Especialista</th>
                     <th>Asignar consulta</th>
                 </thead>
                 <tfoot class="text-center">
                     <tr>
-                        <th colspan="5">PACIENTES EN ESPERA</th>
+                        <th colspan="7">PACIENTES EN ESPERA</th>
                     </tr>
                 </tfoot>
                 <tbody id="table-espera-body" class="text-center">
                 </tbody>                        
             </table>
         </fieldset>
+
+        <div class="row d-flex justify-content-between">
+            <div class="col-5 d-flex align-items-center justify-content-between">
+                <a href="javascript:void(0);" class="btn btn-info my-5" id="btn-pacientes-mayor-riesgo">Pacientes mayor riesgo</a>
+                <input type="text" placeholder="Historia clinica..." class="d-inline form-control w-50" id="historia-clinica-pacientes-input">
+            </div>
+            <a href="javascript:void(0);" class="btn btn-info mr-3 my-5" id="btn-paciente-mas-anciano">Paciente más anciano</a>
+        </div>
+
+        <fieldset class="d-none" id="paciente-mas-anciano">
+            <legend class="w-100 d-flex justify-content-center h2 ">Paciente más anciano</legend>
+            <table class="tabla table-dark table table-striped table-hover table-bordered rounded mt-3" id="table-espera-anciano">
+                <thead class="text-center">                            
+                    <th>Paciente</th>
+                    <th>Edad</th>
+                    <th>Prioridad</th>
+                    <th>Historia clinica</th>
+                    <th>Tipo consulta</th>
+                    <th>Especialista</th>
+                    <th>Asignar consulta</th>
+                </thead>
+                <tfoot class="text-center">
+                    <tr>
+                        <th colspan="7">PACIENTE MAS ANCIANO</th>
+                    </tr>
+                </tfoot>
+                <tbody id="table-anciano-body" class="text-center">
+                </tbody>                        
+            </table>
+        </fieldset>
            
+        <fieldset class="d-none" id="pacientes-mayor-riesgo" class="d-none">
+            <div class="row">
+                <a href="javascript:void(0);" class="btn btn-danger ml-3" id="cerrar-mayor-riesgo"> X </a>
+            </div>
+            <legend class="w-100 d-flex justify-content-center h2 ">Pacientes mayor riesgo</legend>
+            <table class="tabla table-dark table table-striped table-hover table-bordered rounded mt-3" id="table-espera-riesgo">
+                <thead class="text-center">                            
+                    <th>Paciente</th>
+                    <th>Edad</th>
+                    <th>Prioridad</th>
+                    <th>Historia clinica</th>
+                    <th>Tipo consulta</th>
+                    <th>Especialista</th>
+                    <th>Asignar consulta</th>
+                </thead>
+                <tfoot class="text-center">
+                    <tr>
+                        <th colspan="7">PACIENTES MAYOR RIESGO</th>
+                    </tr>
+                </tfoot>
+                <tbody id="table-riesgo-body" class="text-center">
+                </tbody>                        
+            </table>            
+        </fieldset>
         
           
            
@@ -112,8 +179,8 @@
                     
         
         <!-- Jquery Datatables -->
-        <!-- <script src="https://code.jquery.com/jquery-3.5.1.js"></script> -->
-        <script type="text/javascript" src="{{ url_for('static', filename='Bootstrap/jquery-3.5.1.slim.min.js') }}"></script>
+        <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+        <!-- <script type="text/javascript" src="{{ url_for('static', filename='Bootstrap/jquery-3.5.1.slim.min.js') }}"></script> -->
         <!-- Datatables compatible con boostrap -->
         <script src="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
         <script src="https://cdn.datatables.net/1.10.23/js/dataTables.bootstrap4.min.js"></script>    
