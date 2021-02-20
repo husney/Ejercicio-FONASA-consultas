@@ -1,4 +1,5 @@
-CREATE DEFINER=`root`@`localhost` PROCEDURE `crudPaciente`(
+DELIMITER //
+CREATE PROCEDURE `crudPaciente`(
     IN operacion INT,
 	IN idP INT ,
     IN nombreP VARCHAR(100),
@@ -32,4 +33,5 @@ BEGIN
 		SELECT id, nombre, edad, noHistoriaClinica, prioridad, riesgo FROM paciente WHERE ID = idP;
     END IF;
     
-END
+END //
+DELIMITER ;

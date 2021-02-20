@@ -14,6 +14,8 @@ const liberarConsultas = document.getElementById('btnLiberarConsultas');
 const btnPacienteMasAnciano = document.getElementById('btn-paciente-mas-anciano');
 const tablaAnciano = document.getElementById('table-anciano-body');
 const btnPacientesMayorRiesgo = document.getElementById('btn-pacientes-mayor-riesgo');
+const btnPacientesFumadores = document.getElementById('btn-pacientes-fumadores');
+const pacientesFumadoresList = document.getElementById('pacientes-fumadores-list');
 const tablaMayorRiesgo = document.getElementById('table-riesgo-body');
 const historiaClinicaBusqueda = document.getElementById('historia-clinica-pacientes-input');
 const btnCerrarMayorRiesgo = document.getElementById('cerrar-mayor-riesgo');
@@ -176,6 +178,7 @@ btnPacienteMasAnciano.addEventListener('click', () =>{
 })
 
 btnPacientesMayorRiesgo.addEventListener('click', cargarPacientesMayorRiesgo);
+btnPacientesFumadores.addEventListener('click', mostrarFumadoresUrgentes);
 
 function cargarPacientesMayorRiesgo(){
     const busqueda = historiaClinicaBusqueda.value;
@@ -201,6 +204,32 @@ function cargarPacientesMayorRiesgo(){
     //}
 
     document.getElementById('pacientes-mayor-riesgo').classList.remove('d-none');
+}
+
+function mostrarFumadoresUrgentes(){
+    limpiarPacientesFumadores();
+    const pacientesFumadoresSet = document.getElementById('pacientes-fumadores');
+    if(pacientesFumadoresSet.classList.contains('d-none')){
+        pacientesFumadoresSet.classList.remove('d-none');
+    }else{
+        pacientesFumadoresSet.classList.add('d-none');
+    }
+    axios.get(`${api.url}/pacientesFumadoresUrgentes`).then(response =>{
+        console.log(response.data);
+        response.data.forEach(dato =>{
+            const li = document.createElement('li');
+            li.textContent = dato.nombre;
+            pacientesFumadoresList.appendChild(li);
+        })
+    }).catch(e =>{
+        console.log(e);
+    })
+}
+
+function limpiarPacientesFumadores(){
+    while(pacientesFumadoresList.firstChild){
+        pacientesFumadoresList.removeChild(pacientesFumadoresList.firstChild);
+    }
 }
 
 // Elimina una consulta Actual
@@ -230,6 +259,7 @@ function eliminarConsultaActual(id){
 // Guarda una consulta en la tabla de registro
 function guardarRegistroConsulta(consulta){
     
+    moment.locale('es');
     const datos = {
         "consulta": consulta.idConsulta,
         "cantidadPacientes" : consulta.cantidadPacientes,
@@ -237,7 +267,9 @@ function guardarRegistroConsulta(consulta){
         "paciente" : consulta.idPaciente,
         "hospital" : consulta.hospital,
         "tipoConsulta" : consulta.idTipoConsulta,
-        "fechaInicio" : consulta.fechaInicio
+        //"fechaInicio" : consulta.fechaInicio
+        "fechaInicio" : moment().format('YYYY-MM-D', consulta.fechaInicio)
+        
     }
     axios.post(`${api.url}/bitacoraConsultas`, datos).then(response =>{
     }).catch(e =>{  
@@ -245,17 +277,20 @@ function guardarRegistroConsulta(consulta){
     })
 }
 
+axios.get(`${api.url}/pacientesFumadoresUrgentes`).then(response =>{
+    console.log(response.data);
+}).catch(e =>{
+    console.log(e);
+})
+
 // Muestra y actualiza la tabla de los pacientes
 function actualizarTablaEspera(){
         
     axios.get(`${api.url}/pacientesEspera`).then(response =>{
-        //console.log(response);
         let idRow = 0;
         const pacientesEsperando = [];
-        //tablaPacientesEnEspera.innerHTML = '';
         response.data.forEach(paciente =>{
-            idRow = 0;
-            //crearFilaEnEspera(paciente);
+            idRow = 0;            
             let pac = [paciente.nombre, paciente.edad ,paciente.prioridad, paciente.noHistoriaClinica, `<select class="custom-select" id="en-espera-select-${paciente.id}"></select>`,
             `<input type="text" name="EspecialistaNombre" id="nombreEspecialista-paciente-espera${paciente.id}" class="form-control">`,`<a href="javascript:void(0);" id="asignarConsulta-${paciente.id}" onclick="asignarConsultaPaciente('nombreEspecialista-paciente-espera${paciente.id}', ${paciente.id})" class="asignar-consulta "><i class="fas fa-paste h4 text-info"></i></a>`, paciente];
             pacientesEsperando.push(pac);
@@ -437,7 +472,7 @@ function asignarConsultaPaciente(idRow, idPac){
                 btnCerrarMayorRiesgo.click();
             }
             
-
+            //#region eliminar consulta sin dataTable
             // datosPaciente.remove();
             // if(document.getElementById(`en-espera-pac-${id}-anciano`)){
             //     document.getElementById(`en-espera-pac-${id}-anciano`).remove();
@@ -447,6 +482,7 @@ function asignarConsultaPaciente(idRow, idPac){
             // if(document.getElementById(`en-espera-pac-${id}-mayor-riesgo`)){
             //     document.getElementById(`en-espera-pac-${id}-mayor-riesgo`).remove();
             // }
+            //#endregion
         //}
     }
     
@@ -457,6 +493,7 @@ function asignarConsultaPaciente(idRow, idPac){
     pacientesMayorRiesgo.clear().draw();
     eliminarPacienteEspera(idPac);
     cargarCantidad();
+    btnPacientesFumadores.click();
     //cargarPacientesMayorRiesgo();
 }
 
@@ -475,14 +512,11 @@ function eliminarPacienteEspera(id){
     
     const datos = {
         "paciente": id
-    }
-    
+    }    
     // Delete no recibe cuerpo de datos por lo cual se debe realizar con esta sintaxis
     axios({
         method: 'DELETE',
         url: `${api.url}/pacientesEspera`,
         data: datos
-      })
-
-    
+      })    
 }

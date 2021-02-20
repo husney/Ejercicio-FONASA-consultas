@@ -548,6 +548,29 @@ class LiberarTodasConsultas(Resource):
                 return jsonify({"estado": "Consultas liberadas"})
             except Exception as ex:
                 return jsonify({"estado": f"Error al liberar las consultas {ex}"})
+            
+class PacientesFumadoresUrgentes(Resource):
+    
+    def get(self):
+         with Cursor(mysql) as db:
+            try:
+                db.callproc('sp_Ingresados', (Consultas.enConsulta.value, None))
+                pacientes = db.fetchall()
+                app.logger.info(pacientes)
+                datos = []
+                for paciente in pacientes:
+                    pac = {
+                        'id' : paciente[0],
+                        'nombre' : paciente[1],
+                        'riesgo' : float(str(paciente[2])),
+                        'prioridad' : float(str(paciente[3])),
+                        'fumador' : bool(paciente[4]),
+                        'tiempoFumador' : paciente[5]
+                    }
+                    datos.append(pac)
+                return jsonify(datos);
+            except Exception as ex:
+                return jsonify({"estado": f"Error al consultar pacientes {ex}"})
 
 class PacienteMasAnciano(Resource):
     
@@ -589,8 +612,7 @@ class PacientesBusquedaHistoriaclinica(Resource):
                         'prioridad': float(str(paciente[6]))
                     }
                     datos.append(pac)
-                return jsonify(datos)
-                return jsonify(pacientes)
+                return jsonify(datos)         
             except Exception as ex:
                 return jsonify({"estado" : f"Error al consultar pacientes {ex}"})
             
@@ -604,8 +626,10 @@ api.add_resource(LiberarConsultas, '/LiberarConsutlas')
 api.add_resource(BitacoraConsultas, '/bitacoraConsultas')            
 api.add_resource(InfConsultaMasAtendida, '/InfConsultaMasAtendida')
 api.add_resource(LiberarTodasConsultas, '/liberarTodasConsultas')
+api.add_resource(PacientesFumadoresUrgentes, '/pacientesFumadoresUrgentes')
 api.add_resource(PacienteMasAnciano, '/PacienteMasAnciano')
 api.add_resource(PacientesBusquedaHistoriaclinica, '/pacientesHistoriaClinica')
 
 if __name__ == ('__main__'):
     app.run(debug=True)
+

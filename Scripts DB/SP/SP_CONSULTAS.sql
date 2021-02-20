@@ -1,8 +1,12 @@
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_Consultas`(
+DELIMITER //
+CREATE PROCEDURE `sp_Consultas`(
 	IN operacion INT,
 	IN cantidadP INT
 )
 BEGIN
+	
+    SET @Lcantiadad = cantidadP;
+
 	IF operacion = 0 THEN
 		INSERT INTO cantidadConsultas(cantidad)
 		VALUES (cantidadP);
@@ -10,7 +14,7 @@ BEGIN
     END IF;
     
     IF operacion = 1 THEN
-		UPDATE cantidadConsultas SET cantidad = cantidadP WHERE id = 1;
+		UPDATE cantidadConsultas SET cantidad = @Lcantiadad WHERE id = 1;
     END IF;
     
     IF operacion = 3 THEN
@@ -42,4 +46,5 @@ BEGIN
 		ORDER BY paciente.prioridad DESC;
     END IF;
     
-END
+END //
+DELIMITER ;

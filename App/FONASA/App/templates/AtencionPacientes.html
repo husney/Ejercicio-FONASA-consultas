@@ -117,9 +117,10 @@
             </table>
         </fieldset>
 
-        <div class="row d-flex justify-content-between">
-            <div class="col-5 d-flex align-items-center justify-content-between">
-                <a href="javascript:void(0);" class="btn btn-info my-5" id="btn-pacientes-mayor-riesgo">Pacientes mayor riesgo</a>
+        <div class="row d-flex justify-content-between">            
+            <div class="col-6 d-flex align-items-center justify-content-between">
+                <a href="javascript:void(0);" class="btn btn-info my-5 mr-1" id="btn-pacientes-fumadores">Fumadores</a>
+                <a href="javascript:void(0);" class="btn btn-info my-5 mr-1" id="btn-pacientes-mayor-riesgo">Pacientes mayor riesgo</a>
                 <input type="text" placeholder="Historia clinica..." class="d-inline form-control w-50" id="historia-clinica-pacientes-input">
             </div>
             <a href="javascript:void(0);" class="btn btn-info mr-3 my-5" id="btn-paciente-mas-anciano">Paciente más anciano</a>
@@ -147,7 +148,7 @@
             </table>
         </fieldset>
            
-        <fieldset class="d-none" id="pacientes-mayor-riesgo" class="d-none">
+        <fieldset class="d-none" id="pacientes-mayor-riesgo">
             <div class="row">
                 <a href="javascript:void(0);" class="btn btn-danger ml-3" id="cerrar-mayor-riesgo"> X </a>
             </div>
@@ -171,13 +172,14 @@
                 </tbody>                        
             </table>            
         </fieldset>
+
+        <fieldset class="d-none" id="pacientes-fumadores">
+            <legend>Pacientes fumadores urgentes</legend>
+            <ul id="pacientes-fumadores-list"></ul>                
+            </ul>
+        </fieldset>
         
-          
-           
-            
-            
-                    
-        
+
         <!-- Jquery Datatables -->
         <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
         <!-- <script type="text/javascript" src="{{ url_for('static', filename='Bootstrap/jquery-3.5.1.slim.min.js') }}"></script> -->
@@ -186,6 +188,7 @@
         <script src="https://cdn.datatables.net/1.10.23/js/dataTables.bootstrap4.min.js"></script>    
         <script src="{{ url_for('static', filename='js/dataTable.js')}}"></script>
         
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
         <!-- Axios JS -->
         <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
         <script src="{{ url_for('static', filename='js/atencionPacientes.js')}}"></script>

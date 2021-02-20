@@ -1,6 +1,5 @@
-DROP PROCEDURE crudPacienteAnciano;
 DELIMITER //
-CREATE PROCEDURE crudPacienteAnciano(
+CREATE PROCEDURE `crudPacienteAnciano`(
 	IN operacion INT,    
     IN tieneDietaP BIT,
     IN idPacienteP INT
@@ -32,20 +31,5 @@ BEGIN
 		SELECT id, tieneDieta, idPaciente FROM PAnciano WHERE idPaciente = @LidPaciente;
     END IF;
     
-END//
+END //
 DELIMITER ;
-
-CALL crudPacienteAnciano(4,null, 56);
-
-SELECT * FROM Paciente;
-SELECT * FROM PAnciano;
-DELETE FROM PAnciano;
-
-# Operacion #Tiene dieta #id paciente
-CALL crudPacienteAnciano(0,false,3); #Insertar
-CALL crudPacienteAnciano(1,false,1); #Acutalizar
-CALL crudPacienteAnciano(2,null,1); #Eliminar
-CALL crudPacienteAnciano(3,null,null); #Seleccionar todos
-CALL crudPacienteAnciano(4,null,2); #Seleccionar Por ID
-
-

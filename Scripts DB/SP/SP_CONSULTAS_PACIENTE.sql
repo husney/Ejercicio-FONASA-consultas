@@ -1,4 +1,5 @@
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_ConsultasPaciente`(
+DELIMITER //
+CREATE PROCEDURE `sp_ConsultasPaciente`(
 	IN operacion INT,
     IN idP INT,
     IN cantidadPacientesP INT,
@@ -56,4 +57,5 @@ BEGIN
     END IF;
     
 
-END
+END //
+DELIMITER ;

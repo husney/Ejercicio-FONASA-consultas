@@ -1,4 +1,5 @@
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_Ingresados`(
+DELIMITER //
+CREATE PROCEDURE `sp_Ingresados`(
 	IN operacion INT,
     IN idPacientep INT
 )
@@ -68,4 +69,19 @@ BEGIN
 			WHERE paciente.edad > 15 and paciente.edad < 41
 			ORDER BY paciente.prioridad DESC );
     END IF;
-END
+    
+    IF operacion = 6 THEN
+		SELECT 
+		paciente.id AS IdPaciente,
+		paciente.nombre AS Nombre,
+		paciente.riesgo AS Riesgo,
+		paciente.prioridad AS Prioridad,
+		pjoven.fumador AS Fumador,
+		pjoven.aniosFumador AS TiempoFumador
+		FROM ingresados
+		INNER JOIN paciente ON paciente.id = ingresados.idPaciente AND paciente.edad between 21 AND 40
+		INNER JOIN pjoven ON pjoven.idPaciente = paciente.id
+		ORDER BY paciente.prioridad desc , paciente.riesgo desc;
+    END IF;
+END //
+DELIMITER ;

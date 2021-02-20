@@ -1,111 +1,121 @@
-CREATE DATABASE IF NOT EXISTS FONASA;
+CREATE DATABASE Fonasa;
 
-USE FONASA;
+SET GLOBAL sql_mode = 'NO_ENGINE_SUBSTITUTION';
+SET SESSION sql_mode = 'NO_ENGINE_SUBSTITUTION';
 
-SELECT * FROM registroConsultas;
-CREATE TABLE registroConsultas(
-id INT AUTO_INCREMENT PRIMARY KEY,
-cantidadPacientes INT,
-nombreEspecialista VARCHAR(100),
-paciente INT,
-hospital INT,
-tipoConsulta INT,
-fechaInicio DATETIME, 
-fechaFin DATETIME DEFAULT CURRENT_TIMESTAMP,
-idConsulta INT,
+USE Fonasa;
 
-CONSTRAINT fk_registroConsulta_paciente
-	FOREIGN KEY (paciente) REFERENCES paciente(id)
-		ON DELETE CASCADE,
-CONSTRAINT fk_registroConsulta_hospital
-	FOREIGN KEY (hospital) REFERENCES hospital(id),
-CONSTRAINT fk_registroConsulta_tipoConsulta
-	FOREIGN KEY (tipoConsulta) REFERENCES tipoConsulta(id),
-CONSTRAINT fk_registroConsulta_idConsulta
-    FOREIGN KEY (idConsulta) REFERENCES consulta(id)
+CREATE TABLE `paciente` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(100) NOT NULL,
+  `edad` int(11) NOT NULL,
+  `noHistoriaClinica` int(11) DEFAULT NULL,
+  `riesgo` decimal(5,2) DEFAULT NULL,
+  `prioridad` decimal(5,2) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 );
 
-ALTER TABLE registroConsultas DROP CONSTRAINT fk_registroConsulta_paciente;
-
-
-CREATE TABLE IF NOT EXISTS Paciente(
-id INT AUTO_INCREMENT PRIMARY KEY,
-nombre VARCHAR(100) NOT NULL,
-edad INT NOT NULL,
-noHistoriaClinica INT UNIQUE,
-prioridad INT,
-riesgo INT
+CREATE TABLE `panciano` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tieneDieta` bit(1) DEFAULT NULL,
+  `idPaciente` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_PAnciano_Paciente` (`idPaciente`),
+  CONSTRAINT `fk_PAnciano_Paciente` FOREIGN KEY (`idPaciente`) REFERENCES `paciente` (`id`) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS PAnciano(
-id INT AUTO_INCREMENT PRIMARY KEY,
-tieneDieta BIT,
-idPaciente INT NOT NULL,
-CONSTRAINT fk_PAnciano_Paciente
-	FOREIGN KEY (idPaciente) REFERENCES Paciente(id)
-	ON DELETE CASCADE
+CREATE TABLE `pjoven` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `fumador` bit DEFAULT NULL,
+  `aniosFumador` int DEFAULT NULL,
+  `idPaciente` int NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_PJoven_Paciente` (`idPaciente`),
+  CONSTRAINT `fk_PJoven_Paciente` FOREIGN KEY (`idPaciente`) REFERENCES `paciente` (`id`) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS PNinno(
-id INT AUTO_INCREMENT PRIMARY KEY,
-relacionPesoEstatura INT,
-idPaciente INT NOT NULL,
-CONSTRAINT fk_PNinno_Paciente
-	FOREIGN KEY (idPaciente) REFERENCES Paciente(id)
-	ON DELETE CASCADE
+CREATE TABLE `pninno` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `relacionPesoEstatura` int(11) DEFAULT NULL,
+  `idPaciente` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_PNinno_Paciente` (`idPaciente`),
+  CONSTRAINT `fk_PNinno_Paciente` FOREIGN KEY (`idPaciente`) REFERENCES `paciente` (`id`) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS PJoven(
-id INT AUTO_INCREMENT PRIMARY KEY,
-fumador BIT,
-aniosFumador INT, 
-idPaciente INT NOT NULL,
-CONSTRAINT fk_PJoven_Paciente
-	FOREIGN KEY (idPaciente) REFERENCES Paciente(id)
-	ON DELETE CASCADE
+CREATE TABLE `tipoconsulta` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `descripcion` varchar(50) NOT NULL,
+  PRIMARY KEY (`id`)
 );
 
-CREATE TABLE IF NOT EXISTS TipoConsulta(
-id INT AUTO_INCREMENT PRIMARY KEY,
-descripcion VARCHAR(50) NOT NULL
+CREATE TABLE `estado` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `descripcion` varchar(50) NOT NULL,
+  PRIMARY KEY (`id`)
 );
 
-CREATE TABLE IF NOT EXISTS Estado(
-id INT AUTO_INCREMENT PRIMARY KEY,
-descripcion VARCHAR(50) NOT NULL
+CREATE TABLE `hospital` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `fechaCreacion` datetime DEFAULT current_timestamp(),
+  `nombre` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 );
 
-CREATE TABLE IF NOT EXISTS Hospital(
-id INT AUTO_INCREMENT PRIMARY KEY,
-nombre VARCHAR(150) NOT NULL,
-fechaCreacion DATETIME DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE `consulta` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `cantidadPacientes` int(11) DEFAULT NULL,
+  `nombreEspecialista` varchar(100) DEFAULT NULL,
+  `paciente` int(11) DEFAULT NULL,
+  `hospital` int(11) NOT NULL,
+  `tipoConsulta` int(11) DEFAULT NULL,
+  `estado` int(11) NOT NULL,
+  `fechaInicio` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_Consulta_TipoConsulta` (`tipoConsulta`),
+  KEY `fk_Consulta_Estado` (`estado`),
+  KEY `fk_Consulta_Paciente` (`paciente`),
+  KEY `fk_Consulta_Hospital` (`hospital`),
+  CONSTRAINT `fk_Consulta_Estado` FOREIGN KEY (`estado`) REFERENCES `estado` (`id`),
+  CONSTRAINT `fk_Consulta_Hospital` FOREIGN KEY (`hospital`) REFERENCES `hospital` (`id`),
+  CONSTRAINT `fk_Consulta_Paciente` FOREIGN KEY (`paciente`) REFERENCES `paciente` (`id`),
+  CONSTRAINT `fk_Consulta_TipoConsulta` FOREIGN KEY (`tipoConsulta`) REFERENCES `tipoconsulta` (`id`)
 );
 
-DROP TABLE Consulta;
-
-
-CREATE TABLE IF NOT EXISTS Consulta(
-id INT AUTO_INCREMENT PRIMARY KEY,
-cantidadPacientes INT,
-nombreEspecialista VARCHAR(100),
-paciente INT ,
-hospital INT NOT NULL,
-tipoConsulta INT ,
-estado INT NOT NULL,
-fechaInicio DATETIME ,
-CONSTRAINT fk_Consulta_TipoConsulta
-	FOREIGN KEY (tipoConsulta) REFERENCES TipoConsulta(id),
-CONSTRAINT fk_Consulta_Estado
-	FOREIGN KEY (estado) REFERENCES Estado(id),
-CONSTRAINT fk_Consulta_Paciente 
-	FOREIGN KEY (paciente) REFERENCES Paciente(id),
-CONSTRAINT fk_Consulta_Hospital
-	FOREIGN KEY (hospital) REFERENCES Hospital(id)
+CREATE TABLE `registroconsultas` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `cantidadPacientes` int(11) DEFAULT NULL,
+  `nombreEspecialista` varchar(100) DEFAULT NULL,
+  `paciente` int(11) DEFAULT NULL,
+  `hospital` int(11) DEFAULT NULL,
+  `tipoConsulta` int(11) DEFAULT NULL,
+  `fechaInicio` datetime DEFAULT NULL,
+  `fechaFin` datetime DEFAULT current_timestamp(),
+  `idConsulta` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_registroConsulta_paciente` (`paciente`),
+  KEY `fk_registroConsulta_hospital` (`hospital`),
+  KEY `fk_registroConsulta_tipoConsulta` (`tipoConsulta`),
+  KEY `fk_registroConsulta_idConsulta` (`idConsulta`),
+  CONSTRAINT `fk_registroConsulta_hospital` FOREIGN KEY (`hospital`) REFERENCES `hospital` (`id`),
+  CONSTRAINT `fk_registroConsulta_idConsulta` FOREIGN KEY (`idConsulta`) REFERENCES `consulta` (`id`),
+  CONSTRAINT `fk_registroConsulta_paciente` FOREIGN KEY (`paciente`) REFERENCES `paciente` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_registroConsulta_tipoConsulta` FOREIGN KEY (`tipoConsulta`) REFERENCES `tipoconsulta` (`id`)
 );
 
-CREATE TABLE cantidadConsultas(
-id INT AUTO_INCREMENT PRIMARY KEY,
-cantidad INT NOT NULL
+CREATE TABLE `cantidadconsultas` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `cantidad` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+);
+
+CREATE TABLE `ingresados` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `idPaciente` int(11) DEFAULT NULL,
+  `fechaIngreso` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `fk_ingresados_paciente` (`idPaciente`),
+  CONSTRAINT `fk_ingresados_paciente` FOREIGN KEY (`idPaciente`) REFERENCES `paciente` (`id`)
 );
 
 /* Registros TipoConsulta */
@@ -116,24 +126,11 @@ VALUES ('Pediatría'),('Urgencia'),('CGI'); /* CGI === Consulta General Integral
 INSERT INTO Estado(descripcion)
 VALUES ('Ocupada'), ('En espera');
 
-CREATE TABLE ingresados(
-id INT,
-idPaciente INT,
-CONSTRAINT fk_ingresados_paciente
-	FOREIGN KEY (idPaciente) REFERENCES Paciente(id)
-);
+INSERT INTO hospital(nombre)
+VALUES ("Fonasa");
 
+INSERT INTO consulta(hospital, estado)
+VALUES (1,2),(1,2),(1,2),(1,2),(1,2),(1,2),(1,2),(1,2),(1,2),(1,2);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+INSERT INTO cantidadconsultas(cantidad)
+VALUES (5);

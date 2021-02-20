@@ -1,4 +1,5 @@
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_Informes`(
+DELIMITER //
+CREATE PROCEDURE `sp_Informes`(
 	IN operacion INT,
     IN noHistoriaClinicaP INT
 )
@@ -42,4 +43,5 @@ BEGIN
 		ORDER BY paciente.edad DESC LIMIT 1;
     END IF;
     
-END
+END //
+DELIMITER ;
